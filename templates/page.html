@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% block title %}Страница №{{ page['id'] }}{% endblock %}
+{% block body %}
+<a class="back" href="{{ url_for('index') }}">← Назад к списку</a>
+<section class="hero">
+  <div><p class="eyebrow">СТРАНИЦА #{{ page['id'] }}</p>
+    <h1>{{ page['title'] or 'Страница' }}</h1>
+    <div class="muted wrap-url">{{ page['url'] }}</div>
+  </div>
+  <span class="pill">{{ '● Активна' if page['enabled'] else '● Выключена' }}</span>
+</section>
+<section class="card wide">
+  <div class="actions">
+    <form method="post" action="{{ url_for('check_now', page_id=page['id']) }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <button class="button primary">Проверить сейчас</button>
+    </form>
+    <form method="post" action="{{ url_for('toggle_page', page_id=page['id']) }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <button class="button secondary">{{ 'Отключить' if page['enabled'] else 'Включить' }}</button>
+    </form>
+    <form method="post" action="{{ url_for('delete_page', page_id=page['id']) }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <button class="button destructive">Удалить</button>
+    </form>
+  </div>
+  <p class="small muted">Интервал: {{ page['interval_hours'] }} ч · Последняя проверка: {{ page['last_checked'] or 'не было' }}</p>
+  <details class="details"><summary>Редактировать название и расписание</summary>
+    <form method="post" action="{{ url_for('update_page', page_id=page['id']) }}" class="form-stack edit-form">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <label>Название<input name="title" maxlength="80" value="{{ page['title'] }}"></label>
+      <label>Интервал<select name="interval_hours">
+        {% for hours in (6,12,24,48) %}
+          <option value="{{ hours }}" {{ 'selected' if hours==page['interval_hours'] else '' }}>{{ hours }} часов</option>
+        {% endfor %}
+      </select></label>
+      <button class="button secondary" type="submit">Сохранить</button>
+    </form>
+  </details>
+  {% if page['last_error'] %}<p class="alert error">Ошибка: {{ page['last_error'] }}</p>{% endif %}
+</section>
+<div class="two-col equal">
+  <section class="card"><h2>История изменений</h2>
+    {% for event in events %}
+      <div class="history-item"><span class="small muted">{{ event['checked_at'] }} {% if event['notified'] %}· Telegram ✓{% endif %}</span>
+        <pre>{{ event['summary'] }}</pre></div>
+    {% else %}<p class="muted">Изменений ещё нет.</p>{% endfor %}
+  </section>
+  <section class="card"><h2>Журнал проверок</h2>
+    {% for run in runs %}
+      <div class="history-item"><span class="small muted">{{ run['run_at'] }}</span>
+        <div><span class="status {{ 'good' if run['status']=='same' else 'warn' if run['status']=='changed' else '' }}">{{ run['status'] }}</span></div>
+        <p class="small wrap-url">{{ run['description'] }}</p></div>
+    {% else %}<p class="muted">Проверок пока нет.</p>{% endfor %}
+  </section>
+</div>
+{% endblock %}
