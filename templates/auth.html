@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block title %}{{ 'Регистрация' if register else 'Вход' }}{% endblock %}
+{% block body %}
+<section class="auth card">
+  <p class="eyebrow">RIVALWATCH ACCOUNT</p>
+  <h1>{{ 'Создать аккаунт' if register else 'Войти в кабинет' }}</h1>
+  <p class="muted">Следи за изменениями сайтов в одном месте.</p>
+  <form method="post" class="form-stack">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <label>Логин
+      <input name="username" required minlength="3" maxlength="30" autocomplete="username" placeholder="например, student_01">
+    </label>
+    <label>Пароль
+      <input name="password" type="password" minlength="10" maxlength="128" required
+             autocomplete="{{ 'new-password' if register else 'current-password' }}" placeholder="Не менее 10 символов">
+    </label>
+    <button class="button primary" type="submit">{{ 'Создать аккаунт' if register else 'Войти' }}</button>
+  </form>
+  <p class="muted">
+    {% if register %}Уже есть аккаунт? <a href="{{ url_for('login') }}">Войти</a>
+    {% else %}Нет аккаунта? <a href="{{ url_for('register') }}">Зарегистрироваться</a>{% endif %}
+  </p>
+</section>
+{% endblock %}
