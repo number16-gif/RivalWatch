@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% block title %}Главная{% endblock %}
+{% block body %}
+<section class="hero">
+  <div><p class="eyebrow">ПАНЕЛЬ УПРАВЛЕНИЯ</p>
+    <h1>Мониторинг сайтов</h1>
+    <p class="muted">Отслеживай изменения публичных веб-страниц.</p>
+  </div>
+  <span class="pill">● Локальная версия</span>
+</section>
+<section class="stats">
+  <article class="card stat"><p>Страницы</p><strong>{{ pages|length }}</strong></article>
+  <article class="card stat"><p>Активные</p><strong>{{ pages|selectattr('enabled')|list|length }}</strong></article>
+  <article class="card stat"><p>Изменения</p><strong>{{ changes }}</strong></article>
+</section>
+<div class="two-col">
+  <section class="card">
+    <h2>Добавить страницу</h2>
+    <p class="muted small">Только публичные HTTPS-страницы, разрешающие автоматическую проверку.</p>
+    <form method="post" action="{{ url_for('add_page') }}" class="form-stack">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <label>Ссылка<input type="url" name="url" required maxlength="1500" placeholder="https://example.com/"></label>
+      <label>Название<input name="title" maxlength="80" placeholder="Например, сайт конкурента"></label>
+      <label>Интервал
+        <select name="interval_hours">
+          <option value="6">6 часов</option>
+          <option value="12">12 часов</option>
+          <option value="24">24 часа</option>
+          <option value="48">48 часов</option>
+        </select>
+      </label>
+      <button class="button primary" type="submit">+ Добавить сайт</button>
+    </form>
+  </section>
+  <section class="card info">
+    <h2>Демостраница</h2>
+    <p>Работает без интернета. Сначала сохрани исходную версию страницы, затем измени цену в файле <code>demo.html</code> и проверь снова.</p>
+    <form method="post" action="{{ url_for('demo_add') }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <button class="button secondary" type="submit">Добавить демо</button>
+    </form>
+    <p class="muted small">Для автоматических проверок запусти <code>worker.py</code>.</p>
+  </section>
+</div>
+<section class="card wide">
+  <h2>Твои страницы</h2>
+  {% if pages %}
+  <div class="table-wrap"><table><thead><tr><th>Название / URL</th><th>Период</th><th>Статус</th><th>Последняя проверка</th><th></th></tr></thead><tbody>
+    {% for page in pages %}
+      <tr><td><b>{{ page['title'] or 'Без названия' }}</b><div class="muted small wrap-url">{{ page['url'] }}</div></td>
+      <td>{{ page['interval_hours'] }} ч</td>
+      <td><span class="status {{ 'good' if page['enabled'] else '' }}">{{ 'Активна' if page['enabled'] else 'Выключена' }}</span>
+        {% if page['last_error'] %}<div class="small danger">Ошибка</div>{% endif %}</td>
+      <td class="small">{{ page['last_checked'] or 'Ещё не было' }}</td>
+      <td><a class="button outline compact" href="{{ url_for('page_detail',page_id=page['id']) }}">Открыть</a></td></tr>
+    {% endfor %}
+  </tbody></table></div>
+  {% else %}<p class="muted">Пока нет страниц. Добавь ссылку или демостраницу.</p>{% endif %}
+</section>
+<section class="card wide"><h2>Последние проверки</h2>
+  {% for item in runs %}
+  <div class="event">
+    <span class="status {{ 'good' if item['status']=='same' else 'warn' if item['status']=='changed' else '' }}">{{ item['status'] }}</span>
+    <div><strong class="wrap-url">{{ item['url'] }}</strong><div class="small muted">{{ item['run_at'] }} · {{ item['description'][:140] }}</div></div>
+  </div>
+  {% else %}<p class="muted">История пока пуста.</p>{% endfor %}
+</section>
+{% endblock %}
