@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block title %}Настройки{% endblock %}
+{% block body %}
+<section class="hero"><div>
+  <p class="eyebrow">НАСТРОЙКИ</p>
+  <h1>Telegram-уведомления</h1>
+  <p class="muted">При изменении страницы RivalWatch может прислать сообщение.</p>
+</div></section>
+<section class="card config">
+  <h2>Подключение</h2>
+  <ol class="steps">
+    <li>Создай собственного бота в Telegram через @BotFather.</li>
+    <li>Скопируй <code>.env.example</code> в <code>.env</code> и добавь туда <code>TELEGRAM_BOT_TOKEN</code>. Никогда не публикуй этот файл.</li>
+    <li>Напиши боту <code>/start</code>, затем выполни <code>python telegram_chat_id.py</code>, чтобы узнать Chat ID.</li>
+    <li>Введи Chat ID ниже и перезапусти worker.</li>
+  </ol>
+  <form method="post" class="form-stack">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <label>Telegram Chat ID
+      <input name="telegram_chat_id" value="{{ g.user['telegram_chat_id'] or '' }}" placeholder="Например, 123456789">
+    </label>
+    <button class="button primary" type="submit">Сохранить</button>
+  </form>
+  <p class="small muted">Если Chat ID пустой, уведомления отключены.</p>
+</section>
+{% endblock %}
