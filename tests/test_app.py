@@ -49,7 +49,7 @@ class RivalWatchTests(unittest.TestCase):
             f"/pages/{page_id}/check", data={"csrf_token": self.csrf()}
         )
         engine.DEMO_PATH.write_text(
-            "<html><body>Цена: 900 рублей</body></html>", encoding="utf-8"
+            "<html><body><main><h1>Демо</h1><p>Цена: 900 рублей</p></main></body></html>", encoding="utf-8"
         )
         self.client.post(
             f"/pages/{page_id}/check", data={"csrf_token": self.csrf()}
