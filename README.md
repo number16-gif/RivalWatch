@@ -1,5 +1,7 @@
 # RivalWatch 🔎
 
+[![Python tests](https://github.com/number16-gif/RivalWatch/actions/workflows/tests.yml/badge.svg)](https://github.com/number16-gif/RivalWatch/actions/workflows/tests.yml)  ![Python 3.11+](https://img.shields.io/badge/Python-3.11%2B-3776AB?logo=python&logoColor=white)  ![Local prototype](https://img.shields.io/badge/status-local%20prototype-64748b)
+
 **Учебный Python-проект: мониторинг изменений веб-страниц с веб-интерфейсом и Telegram-уведомлениями.**
 
 [English README](README.en.md) · [Как выложить проект на GitHub](GITHUB_UPLOAD.md)
